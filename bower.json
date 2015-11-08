@@ -1,0 +1,26 @@
+{
+  "name": "xpens-track",
+  "description": "xpens track app",
+  "main": "index.js",
+  "authors": [
+    "sangrampp <sangrampp@gmail.com>"
+  ],
+  "license": "ISC",
+  "moduleType": [
+    "node"
+  ],
+  "homepage": "https://github.com/sundarcodes/Xpens-Track",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-ui-router": "~0.2.15",
+    "angular": "~1.4.7",
+    "bootstrap": "~3.3.5",
+    "bootswatch": "~3.3.5+4"
+  }
+}
