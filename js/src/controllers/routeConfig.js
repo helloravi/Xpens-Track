@@ -12,11 +12,11 @@ angular.module('Xpens-Track')
       controller: "HomeController",
       controllerAs: "homeCntrl"
     })
-    .state('tasks.list', {
-      url: "/tasks",
-      templateUrl: "view/tasks.list.tmpl.html",
-      controller: "taskController",
-      controllerAs: "taskCntrl"
+    .state('expenses', {
+      url: "/expenses",
+      templateUrl: "view/expenses.tmpl.html",
+      controller: "ExpenseController",
+      controllerAs: "expenseCntrl"
     })
     .state('state2', {
       url: "/state2",
