@@ -8,28 +8,28 @@ angular.module('Xpens-Track')
   $stateProvider
     .state('home', {
       url: "/",
-      templateUrl: "view/home.tmpl.html",
+      templateUrl: "app/view/home.tmpl.html",
       controller: "UserController",
       controllerAs: "userCntrl",
       authenticate: false
     })
     .state('expenses', {
       url: "/expenses",
-      templateUrl: "view/expenses.tmpl.html",
+      templateUrl: "app/view/expenses.tmpl.html",
       controller: "ExpenseController",
       controllerAs: "expenseCntrl",
       authenticate: true
     })
     .state('user', {
       url: "/user",
-      templateUrl: "view/user.tmpl.html",
+      templateUrl: "app/view/user.tmpl.html",
       controller: "UserController",
       controllerAs: "userCntrl",
       authenticate: true
     })
     .state('state2.list', {
       url: "/list",
-      templateUrl: "view/state2.list.html",
+      templateUrl: "app/view/state2.list.html",
       controller: function($scope) {
         $scope.things = ["A", "Set", "Of", "Things"];
       }
