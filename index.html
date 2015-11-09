@@ -3,13 +3,15 @@
 <head>
   <title></title>
   <link rel="stylesheet" type="text/css" href="/bower_components/bootswatch/flatly/bootstrap.css">
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
   <script type="text/javascript" src="http://www.parsecdn.com/js/parse-latest.js"></script>
   <script type="text/javascript" src="app/js/main.js"></script>
   <link rel="stylesheet" type="text/css" href="app/css/main.css">
 </head>
 <body>
   <header>
-    <nav class="navbar navbar-inverse">
+    <nav class="navbar navbar-inverse" ng-controller="UserController as userCntrl">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
@@ -22,10 +24,18 @@
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
-          <ul class="nav navbar-nav navbar-right">
+          <ul class="nav navbar-nav navbar-right" ng-show="userCntrl.loggedIn()">
             <li><a ui-sref="home">Expenses</a></li>
             <li><a ui-sref="expenses">My Share</a></li>
-            <!-- <li><a ui-sref="expenses">My Share</a></li> -->
+            <li class="dropdown">
+             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{userCntrl.username()}} <span class="caret"></span></a>
+             <ul class="dropdown-menu" role="menu">
+               <li><a href="#">Profile</a></li>
+               <li><a href="#">Settings</a></li>
+               <li class="divider"></li>
+               <li><a href="#" ng-click="userCntrl.logout()">Logout</a></li>
+             </ul>
+           </li>
           </ul>
         </div>
       </div>
