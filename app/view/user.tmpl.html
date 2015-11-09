@@ -10,7 +10,7 @@
             <div class="col-lg-10">
               <input type="text" class="form-control" id="inputEmail" placeholder="someone" ng-model="userCntrl.searchUser">
             </div>
-          </div>          
+          </div>
           <div class="form-group">
             <div class="col-lg-10 col-lg-offset-2">
               <button type="reset" class="btn btn-default">Cancel</button>
@@ -19,14 +19,13 @@
           </div>
         </fieldset>
       </form>
-      <div class="list-group">
-        <div class="list-group-item" ng-repeat="user in userCntrl.usersToAdd"> 
-        <a href="#" class="btn btn-info pull-right" ng-click="userCntrl.addFriend()">Add Friend</a>       
-        </div>
+      <div class="well" ng-show="userCntrl.friendsFound" ng-repeat="user in userCntrl.usersToAdd">
+        <span >{{userCntrl.searchUser}}</span>
+        <button class="btn btn-info vcenter pull-right">Add Friend</button>
       </div>
     </div>
     <div class="col-md-6">
-      
+
     </div>
   </div>
 </div>

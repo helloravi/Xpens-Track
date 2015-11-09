@@ -1,7 +1,8 @@
 angular.module('Xpens-Track')
-.controller('UserController', [ '$state','$q', 'AuthenticationService', function($state, $q, AuthenticationService){
+.controller('UserController', [ '$state', '$q', 'AuthenticationService', function($state, $q, AuthenticationService){
+
   var userCntrl = this;
-  userCntrl.usersToAdd = [];
+
 
   userCntrl.friendsList = [];
 
@@ -15,6 +16,7 @@ angular.module('Xpens-Track')
     console.log(userCntrl.signupusername);
     console.log(userCntrl.signuppassword);
     AuthenticationService.signup(userCntrl.signupusername,userCntrl.signuppassword);
+    $state.go('user')
   };
 
   userCntrl.currentUser = function(){
@@ -47,6 +49,8 @@ angular.module('Xpens-Track')
 
   userCntrl.searchFriend = function(){
     // console.log(userCntrl.searchUser);
+    userCntrl.friendsFound=false;
+    userCntrl.usersToAdd = [];
     var differedQuery = $q.defer();
     var query = new Parse.Query(Parse.User);
     query.equalTo("username", userCntrl.searchUser);
@@ -58,10 +62,13 @@ angular.module('Xpens-Track')
 
     differedQuery.promise
     .then(function(result){
+      console.log(result);
       userCntrl.usersToAdd.push(result);
+      userCntrl.friendsFound=true;
       // userCntrl.usersToAdd[0].get("username");
     })
     .catch(function(error){
+      userCntrl.friendsFound=false;
       console.log("error getting data for query: " + error.message);
     })
   };
