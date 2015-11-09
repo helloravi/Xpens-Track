@@ -7,24 +7,35 @@
           <div class="form-group">
             <label for="inputEmail" class="col-lg-2 control-label">Search</label>
             <div class="col-lg-10">
-              <input type="text" class="form-control" id="inputEmail" placeholder="someone" ng-model="userCntrl.searchUser">
+              <input type="text" class="form-control" id="inputEmail" placeholder="Find your friends" ng-model="userCntrl.searchUser">
             </div>
           </div>
           <div class="form-group">
             <div class="col-lg-10 col-lg-offset-2">
-              <button type="reset" class="btn btn-default">Cancel</button>
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary">Search</button>
             </div>
           </div>
         </fieldset>
       </form>
       <div class="well" ng-show="userCntrl.friendsFound" ng-repeat="user in userCntrl.usersToAdd">
-        <span >{{user.username}}</span>
-        <button class="btn btn-info vcenter pull-right">Add Friend</button>
+        <span >{{user.get("username")}}</span>
+        <button class="btn btn-info vcenter pull-right" ng-click="userCntrl.addFriend(user)">Add Friend</button>
+      </div>
+      <div class="alert alert-dismissible alert-danger" ng-show="userCntrl.friendsNotFound" >
+        <strong>Oops..</strong> <span>your friend has still not registered to Xpens-Track!</span>
       </div>
     </div>
     <div class="col-md-6">
-
+      <div class="panel panel-success" >
+        <div class="panel-heading">
+          <h3 class="panel-title">Added Friends</h3>
+        </div>
+        <div class="panel-body">
+          <div class="list-group-item" ng-repeat="user in userCntrl.friendsList" ng-show="userCntrl.friendsFound">
+            {{user.get("username")}}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

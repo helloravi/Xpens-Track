@@ -33368,30 +33368,38 @@ angular.module('Xpens-Track')
   userCntrl.searchFriend = function(){
     // console.log(userCntrl.searchUser);
     userCntrl.friendsFound=false;
+    userCntrl.friendsNotFound=false;
     userCntrl.usersToAdd = [];
     var differedQuery = $q.defer();
     var query = new Parse.Query(Parse.User);
     query.equalTo("username", userCntrl.searchUser);
+    userCntrl.searchedUserName=userCntrl.searchUser;
     query.find().then(function(data){
       differedQuery.resolve(data);
     }, function(){
       differedQuery.resolve(error);
     });
 
+
     differedQuery.promise
     .then(function(result){
-      console.log(result);
-      userCntrl.usersToAdd.push(result);
-      userCntrl.friendsFound=true;
-      // userCntrl.usersToAdd[0].get("username");
+      if (result.length !== 0) {
+        //debugger
+        userCntrl.usersToAdd.push(result[0]);
+        userCntrl.friendsFound=true;
+      } else {
+        console.log("nothing returned from Parse");
+        userCntrl.friendsFound=false;
+        userCntrl.friendsNotFound=true;
+      }
     })
     .catch(function(error){
       userCntrl.friendsFound=false;
+      userCntrl.friendsNotFound=true;
       console.log("error getting data for query: " + error.message);
     })
   };
 }]);
-
 
 angular.module('Xpens-Track')
 .controller('ExpenseController', [ '$state', '$q',  function($state, $q){
