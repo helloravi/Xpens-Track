@@ -8,6 +8,7 @@ var jsFiles = [
     './bower_components/angular-ui-router/release/angular-ui-router.js',
     './js/src/app.js',
     './js/src/controllers/routeConfig.js',    
+    './js/src/controllers/user-controller.js'
 ]
 
 var cssFiles = [

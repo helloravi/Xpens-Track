@@ -9,14 +9,16 @@ angular.module('Xpens-Track')
     .state('home', {
       url: "/",
       templateUrl: "view/home.tmpl.html",
-      controller: "HomeController",
-      controllerAs: "homeCntrl"
+      controller: "UserController",
+      controllerAs: "userCntrl",
+      authenticate: false
     })
     .state('expenses', {
       url: "/expenses",
       templateUrl: "view/expenses.tmpl.html",
       controller: "ExpenseController",
-      controllerAs: "expenseCntrl"
+      controllerAs: "expenseCntrl",
+      authenticate: true
     })
     .state('state2', {
       url: "/state2",
