@@ -2,13 +2,13 @@
 <div class="container">
   <div class="row">
     <div class="col-md-6">
-      <form class="form-horizontal" ng-submit="userCntrl.addFriend()">
+      <form class="form-horizontal" ng-submit="userCntrl.searchFriend()">
         <fieldset>
           <legend>Search and Add Friends</legend>
           <div class="form-group">
             <label for="inputEmail" class="col-lg-2 control-label">Search</label>
             <div class="col-lg-10">
-              <input type="text" class="form-control" id="inputEmail" placeholder="someone">
+              <input type="text" class="form-control" id="inputEmail" placeholder="someone" ng-model="userCntrl.searchUser">
             </div>
           </div>          
           <div class="form-group">
@@ -19,6 +19,11 @@
           </div>
         </fieldset>
       </form>
+      <div class="list-group">
+        <div class="list-group-item" ng-repeat="user in userCntrl.usersToAdd"> 
+        <a href="#" class="btn btn-info pull-right" ng-click="userCntrl.addFriend()">Add Friend</a>       
+        </div>
+      </div>
     </div>
     <div class="col-md-6">
       

@@ -1,6 +1,7 @@
 angular.module('Xpens-Track')
-.controller('UserController', [ '$state', function($state){
+.controller('UserController', [ '$state', '$q',  function($state, $q){
   var userCntrl = this;
+  userCntrl.usersToAdd = [];
 
   userCntrl.login = function(){
     console.log(userCntrl.loginusername);
@@ -51,5 +52,27 @@ angular.module('Xpens-Track')
 
   userCntrl.addFriend = function(){
 
-  }
+  };
+
+
+  userCntrl.searchFriend = function(){
+    // console.log(userCntrl.searchUser);
+    var differedQuery = $q.defer();
+    var query = new Parse.Query(Parse.User);
+    query.equalTo("username", userCntrl.searchUser);
+    query.find().then(function(data){
+      differedQuery.resolve(data);
+    }, function(){
+      differedQuery.resolve(error);
+    });
+
+    differedQuery.promise
+    .then(function(result){
+      userCntrl.usersToAdd.push(result);
+      // userCntrl.usersToAdd[0].get("username");
+    })
+    .catch(function(error){
+      console.log("error getting data for query: " + error.message);
+    })
+  };
 }]);
