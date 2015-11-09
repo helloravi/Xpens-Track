@@ -11,7 +11,7 @@
             </div>
           </div>
           <div class="form-group">
-            <div class="col-lg-10 col-lg-offset-2">
+            <div class="col-lg-6 col-lg-offset-6">
               <button type="submit" class="btn btn-primary">Search</button>
             </div>
           </div>
@@ -21,14 +21,14 @@
         <span >{{user.get("username")}}</span>
         <button class="btn btn-info vcenter pull-right" ng-click="userCntrl.addFriend(user)">Add Friend</button>
       </div>
-      <div class="alert alert-dismissible alert-danger" ng-show="userCntrl.friendsNotFound" >
+      <div class="alert alert-dismissible alert-warning" ng-show="userCntrl.friendsNotFound" >
         <strong>Oops..</strong> <span>your friend has still not registered to Xpens-Track!</span>
       </div>
     </div>
     <div class="col-md-6">
       <div class="panel panel-success" >
         <div class="panel-heading">
-          <h3 class="panel-title">Added Friends</h3>
+          <h3 class="panel-title">Friends in your list</h3>
         </div>
         <div class="panel-body">
           <div class="list-group-item" ng-repeat="user in userCntrl.friendList()" ng-show="userCntrl.friendsFound">

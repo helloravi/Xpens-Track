@@ -1,12 +1,9 @@
 angular.module('Xpens-Track')
-.run(function($rootScope, $location) {
-    $rootScope.$on( "$routeChangeStart", function(event, next, current) {
-      if ($rootScope.loggedInUser == null) {
-        // no logged user, redirect to /login
-        if ( next.templateUrl === "partials/login.html") {
-        } else {
-          $location.path("/login");
-        }
+.run(function($rootScope, $state,AuthenticationService) {
+    $rootScope.$on( "$stateChangeStart", function(event,toState, toParams, fromState, fromParams) {
+      if (toState.authenticate && !AuthenticationService.loggedIn()){
+        $state.transitionTo("home");
+        event.preventDefault();
       }
     });
   });

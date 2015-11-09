@@ -1,2 +1,9 @@
 .vcenter {
   transform: translateY(-25%); }
+
+.sign-in-dropdown {
+  width: inherit;
+  margin-bottom: 15px; }
+
+.sign-in-dropdown .btn {
+  margin-bottom: 15px; }

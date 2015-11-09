@@ -37,6 +37,18 @@
              </ul>
            </li>
           </ul>
+          <ul class="nav navbar-nav navbar-right" ng-hide="userCntrl.loggedIn()">
+  					<li class="dropdown">
+  						<a class="dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false">Sign In<span class="caret"></span></a>
+  						<div class="dropdown-menu" role="menu" style="padding: 15px; padding-bottom: 0px;">
+  							<form class="form-horizontal" accept-charset="UTF-8" ng-submit="userCntrl.login()">
+  								<input class="form-control sign-in-dropdown" type="text" placeholder="Username" id="username" name="username" ng-model="userCntrl.loginusername">
+  								<input class="form-control sign-in-dropdown" type="password" placeholder="Password" id="password" name="password" ng-model="userCntrl.loginpassword">
+              		<input class="btn btn-primary btn-block sign-in-dropdown" type="submit" id="sign-in" value="Sign In">
+  							</form>
+  						</div>
+  					</li>
+  				</ul>
         </div>
       </div>
     </nav>

@@ -33279,6 +33279,16 @@ angular.module('Xpens-Track', ['ui.router']);
 
 
 angular.module('Xpens-Track')
+.run(function($rootScope, $state,AuthenticationService) {
+    $rootScope.$on( "$stateChangeStart", function(event,toState, toParams, fromState, fromParams) {
+      if (toState.authenticate && !AuthenticationService.loggedIn()){
+        $state.transitionTo("home");
+        event.preventDefault();
+      }
+    });
+  });
+
+angular.module('Xpens-Track')
 .config(function($stateProvider, $urlRouterProvider) {
   //
   // For any unmatched url, redirect to /state1
@@ -33320,15 +33330,27 @@ angular.module('Xpens-Track')
 .controller('UserController', [ '$state', '$q', 'AuthenticationService', 'UserService', function($state, $q, AuthenticationService, UserService){
 
   var userCntrl = this;
-  
+
+  function init(){
+    redirectIfLoggedIn();
+  };
+
   userCntrl.friendList = function(){
     return UserService.friendsList;
+  }
+
+  function redirectIfLoggedIn() {
+     if (AuthenticationService.loggedIn()) {
+       $state.go('user');
+    }
   }
 
   userCntrl.login = function(){
     console.log(userCntrl.loginusername);
     console.log(userCntrl.loginpassword);
     AuthenticationService.login(userCntrl.loginusername,userCntrl.loginpassword);
+    userCntrl.loginusername="";
+    userCntrl.loginpassword="";
   };
 
   userCntrl.signup = function(){
@@ -33400,6 +33422,9 @@ angular.module('Xpens-Track')
       console.log("error getting data for query: " + error.message);
     })
   };
+
+  init();
+
 }]);
 
 angular.module('Xpens-Track')
