@@ -33317,45 +33317,20 @@ angular.module('Xpens-Track')
 });
 
 angular.module('Xpens-Track')
-.controller('UserController', [ '$state', '$q',  function($state, $q){
+.controller('UserController', [ '$state','$q', 'AuthenticationService', function($state, $q, AuthenticationService){
   var userCntrl = this;
   userCntrl.usersToAdd = [];
 
   userCntrl.login = function(){
     console.log(userCntrl.loginusername);
     console.log(userCntrl.loginpassword);
-
-    Parse.User.logIn(userCntrl.loginusername, userCntrl.loginpassword, {
-    success: function(user) {
-      // Do stuff after successful login.
-      console.log("Success with login: " + user.username);
-      $state.go("user");
-      userCntrl.userLoggedIn = true;
-    },
-    error: function(user, error) {
-      // The login failed. Check error to see why.
-      console.log("Error with login: " + error.message);
-      }
-    });
+    AuthenticationService.login(userCntrl.loginusername,userCntrl.loginpassword);
   };
 
   userCntrl.signup = function(){
     console.log(userCntrl.signupusername);
     console.log(userCntrl.signuppassword);
-    var user = new Parse.User();
-    user.set("username", userCntrl.signupusername);
-    user.set("password", userCntrl.signuppassword);    
-
-    user.signUp(null, {
-      success: function(user) {
-        // Hooray! Let them use the app now.
-        console.log("Success with signup: " + user.username);
-      },
-      error: function(user, error) {
-        // Show the error message somewhere and let the user try again.
-        console.log("Error: " + error.code + " " + error.message);
-      }
-    }); 
+    AuthenticationService.signup(userCntrl.signupusername,userCntrl.signuppassword);
   };
 
   userCntrl.currentUser = function(){
@@ -33363,12 +33338,25 @@ angular.module('Xpens-Track')
   };
 
   userCntrl.logout = function(){
-    Parse.User.logOut(userCntrl.currentUser());
-    userCntrl.userLoggedIn = false;
+    AuthenticationService.logout();
+    //userCntrl.userLoggedIn = false;
     $state.go("home");
   };
 
+  userCntrl.loggedIn=function(){
+    return AuthenticationService.loggedIn();
+  };
+
+  userCntrl.username = function() {
+      var currentUser = AuthenticationService.currentUser();
+      if (currentUser) {
+        return currentUser.get("username");
+      } else {
+        return "";
+      }
+    }
   userCntrl.addFriend = function(){
+
 
   };
 
@@ -33394,3 +33382,58 @@ angular.module('Xpens-Track')
     })
   };
 }]);
+
+
+angular.module('Xpens-Track')
+.controller('ExpenseController', [ '$state', '$q',  function($state, $q){
+  var expenseCntrl = this;
+
+  expenseCntrl.users = [];
+  expenseCntrl.title = "";
+
+  expenseCntrl.addUser = function(user){
+    expenseCntrl.users.push(user);
+  };
+
+  
+
+}]);
+angular.module('Xpens-Track')
+  .service('AuthenticationService', function($state) {
+    var AuthenticationService = this;
+
+    AuthenticationService.login = function(username, password) {
+      Parse.User.logIn(username, password, {
+        success: function(user) {
+          console.log("Logged in as " + user.get("username"));
+          $state.go('user')
+        }, error: function(user, error) {
+          console.log("Error logging in: " + error.message);
+        }
+      });
+    };
+
+    AuthenticationService.signup = function(username, password) {
+      Parse.User.signUp(username, password, null, {
+        success: function(user) {
+          console.log("Signedup as " + user.get("username"));
+          $state.go('user')
+        }, error: function(user, error) {
+          console.log("Error signing up: " + error.message);
+        }
+      });
+    };
+
+    AuthenticationService.logout = function() {
+      Parse.User.logOut();
+      $state.go('home');
+    };
+
+    AuthenticationService.currentUser = function() {
+      return Parse.User.current();
+    };
+
+    AuthenticationService.loggedIn = function() {
+      return !!AuthenticationService.currentUser();
+    };
+  });
