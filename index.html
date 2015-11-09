@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html ng-app="Xpens-Track">
+<head>
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="/bower_components/bootswatch/flatly/bootstrap.css">
+  <script type="text/javascript" src="http://www.parsecdn.com/js/parse-latest.js"></script>
+  <script type="text/javascript" src="/js/main.js"></script>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-inverse">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Xpens-Track</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a ui-sref="home">Expenses</a></li>
+            <li><a ui-sref="expenses">My Share</a></li>
+            <!-- <li><a ui-sref="expenses">My Share</a></li> -->
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <div class="container" ui-view></div>
+</body>
+</html>
