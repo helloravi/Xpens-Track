@@ -33359,9 +33359,9 @@ angular.module('Xpens-Track')
         return "";
       }
     }
-  userCntrl.addFriend = function(){
-
-
+  userCntrl.addFriend = function(user){
+    userCntrl.friendsList.push(user);
+    console.log(userCntrl.friendsList);
   };
 
 
