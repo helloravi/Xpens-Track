@@ -20,9 +20,12 @@ angular.module('Xpens-Track')
       controllerAs: "expenseCntrl",
       authenticate: true
     })
-    .state('state2', {
-      url: "/state2",
-      templateUrl: "view/state2.html"
+    .state('user', {
+      url: "/user",
+      templateUrl: "view/user.tmpl.html",
+      controller: "UserController",
+      controllerAs: "userCntrl",
+      authenticate: true
     })
     .state('state2.list', {
       url: "/list",

@@ -1,5 +1,5 @@
 angular.module('Xpens-Track')
-.controller('UserController', function(){
+.controller('UserController', [ '$state', function($state){
   var userCntrl = this;
 
   userCntrl.login = function(){
@@ -10,6 +10,8 @@ angular.module('Xpens-Track')
     success: function(user) {
       // Do stuff after successful login.
       console.log("Success with login: " + user.username);
+      $state.go("user");
+      userCntrl.userLoggedIn = true;
     },
     error: function(user, error) {
       // The login failed. Check error to see why.
@@ -22,8 +24,8 @@ angular.module('Xpens-Track')
     console.log(userCntrl.signupusername);
     console.log(userCntrl.signuppassword);
     var user = new Parse.User();
-    user.set("username", "my name");
-    user.set("password", "my pass");    
+    user.set("username", userCntrl.signupusername);
+    user.set("password", userCntrl.signuppassword);    
 
     user.signUp(null, {
       success: function(user) {
@@ -43,5 +45,11 @@ angular.module('Xpens-Track')
 
   userCntrl.logout = function(){
     Parse.User.logOut(userCntrl.currentUser());
+    userCntrl.userLoggedIn = false;
+    $state.go("home");
   };
-});
+
+  userCntrl.addFriend = function(){
+
+  }
+}]);
