@@ -8,7 +8,8 @@ var jsFiles = [
     './bower_components/angular-ui-router/release/angular-ui-router.js',
     'app/js/src/app.js',
     'app/js/src/controllers/routeConfig.js',
-    'app/js/src/controllers/user-controller.js'
+    'app/js/src/controllers/user-controller.js',
+    'app/js/src/controllers/expense-controller.js'
 ]
 
   gulp.task('scripts', function(){
