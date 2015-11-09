@@ -33321,6 +33321,8 @@ angular.module('Xpens-Track')
   var userCntrl = this;
   userCntrl.usersToAdd = [];
 
+  userCntrl.friendsList = [];
+
   userCntrl.login = function(){
     console.log(userCntrl.loginusername);
     console.log(userCntrl.loginpassword);
