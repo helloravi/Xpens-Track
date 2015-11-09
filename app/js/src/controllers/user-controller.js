@@ -12,6 +12,7 @@ angular.module('Xpens-Track')
     console.log(userCntrl.signupusername);
     console.log(userCntrl.signuppassword);
     AuthenticationService.signup(userCntrl.signupusername,userCntrl.signuppassword);
+    $state.go('user')
   };
 
   userCntrl.currentUser = function(){
