@@ -1,7 +1,10 @@
 angular.module('Xpens-Track')
-.controller('UserController', [ '$state', '$q', 'AuthenticationService', function($state, $q,AuthenticationService){
+.controller('UserController', [ '$state', '$q', 'AuthenticationService', function($state, $q, AuthenticationService){
+
   var userCntrl = this;
 
+
+  userCntrl.friendsList = [];
 
   userCntrl.login = function(){
     console.log(userCntrl.loginusername);
@@ -38,8 +41,9 @@ angular.module('Xpens-Track')
         return "";
       }
     }
-  userCntrl.addFriend = function(){
-
+  userCntrl.addFriend = function(user){
+    userCntrl.friendsList.push(user);
+    console.log(userCntrl.friendsList);
   };
 
 
@@ -71,3 +75,4 @@ angular.module('Xpens-Track')
     })
   };
 }]);
+

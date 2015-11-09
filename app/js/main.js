@@ -33317,9 +33317,12 @@ angular.module('Xpens-Track')
 });
 
 angular.module('Xpens-Track')
-.controller('UserController', [ '$state', '$q', 'AuthenticationService', function($state, $q,AuthenticationService){
+.controller('UserController', [ '$state', '$q', 'AuthenticationService', function($state, $q, AuthenticationService){
+
   var userCntrl = this;
 
+
+  userCntrl.friendsList = [];
 
   userCntrl.login = function(){
     console.log(userCntrl.loginusername);
@@ -33356,8 +33359,9 @@ angular.module('Xpens-Track')
         return "";
       }
     }
-  userCntrl.addFriend = function(){
-
+  userCntrl.addFriend = function(user){
+    userCntrl.friendsList.push(user);
+    console.log(userCntrl.friendsList);
   };
 
 
@@ -33388,6 +33392,21 @@ angular.module('Xpens-Track')
   };
 }]);
 
+
+angular.module('Xpens-Track')
+.controller('ExpenseController', [ '$state', '$q',  function($state, $q){
+  var expenseCntrl = this;
+
+  expenseCntrl.users = [];
+  expenseCntrl.title = "";
+
+  expenseCntrl.addUser = function(user){
+    expenseCntrl.users.push(user);
+  };
+
+  
+
+}]);
 angular.module('Xpens-Track')
   .service('AuthenticationService', function($state) {
     var AuthenticationService = this;
