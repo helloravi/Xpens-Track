@@ -46,6 +46,7 @@ angular.module('Xpens-Track')
   userCntrl.searchFriend = function(){
     // console.log(userCntrl.searchUser);
     userCntrl.friendsFound=false;
+    userCntrl.friendsNotFound=false;
     userCntrl.usersToAdd = [];
     var differedQuery = $q.defer();
     var query = new Parse.Query(Parse.User);
@@ -58,13 +59,14 @@ angular.module('Xpens-Track')
 
     differedQuery.promise
     .then(function(result){
-      console.log(result);
+      console.log(result[0]);
       userCntrl.usersToAdd.push(result);
       userCntrl.friendsFound=true;
       // userCntrl.usersToAdd[0].get("username");
     })
     .catch(function(error){
       userCntrl.friendsFound=false;
+      userCntrl.friendsNotFound=true;
       console.log("error getting data for query: " + error.message);
     })
   };
