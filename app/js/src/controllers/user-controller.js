@@ -1,10 +1,11 @@
 angular.module('Xpens-Track')
-.controller('UserController', [ '$state', '$q', 'AuthenticationService', function($state, $q, AuthenticationService){
+.controller('UserController', [ '$state', '$q', 'AuthenticationService', 'UserService', function($state, $q, AuthenticationService, UserService){
 
   var userCntrl = this;
-
-
-  userCntrl.friendsList = [];
+  
+  userCntrl.friendList = function(){
+    return UserService.friendsList;
+  }
 
   userCntrl.login = function(){
     console.log(userCntrl.loginusername);
@@ -42,7 +43,7 @@ angular.module('Xpens-Track')
       }
     }
   userCntrl.addFriend = function(user){
-    userCntrl.friendsList.push(user);
+    UserService.friendsList.push(user);
     console.log(userCntrl.friendsList);
   };
 
