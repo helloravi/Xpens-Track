@@ -33451,6 +33451,12 @@ angular.module('Xpens-Track')
 
 }]);
 angular.module('Xpens-Track')
+  .service('UserService', function($state){
+    var userService = this;
+    // share the user friend list through the different controllers
+    userService.friendsList = [];
+});
+angular.module('Xpens-Track')
   .service('AuthenticationService', function($state) {
     var AuthenticationService = this;
 

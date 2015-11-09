@@ -31,7 +31,7 @@
           <h3 class="panel-title">Added Friends</h3>
         </div>
         <div class="panel-body">
-          <div class="list-group-item" ng-repeat="user in userCntrl.friendsList" ng-show="userCntrl.friendsFound">
+          <div class="list-group-item" ng-repeat="user in userCntrl.friendList()" ng-show="userCntrl.friendsFound">
             {{user.get("username")}}
           </div>
         </div>
