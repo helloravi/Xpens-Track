@@ -3,7 +3,7 @@
     <div class="col-md-6">
       <form class="form-horizontal" ng-submit="userCntrl.searchFriend()">
         <fieldset>
-          <legend>Search and Add Friends</legend>
+          <legend>Search and Add your Buddies</legend>
           <div class="form-group">
             <label for="inputEmail" class="col-lg-2 control-label">Search</label>
             <div class="col-lg-10">
@@ -28,7 +28,7 @@
     <div class="col-md-6">
       <div class="panel panel-success" >
         <div class="panel-heading">
-          <h3 class="panel-title">Friends in your list</h3>
+          <h3 class="panel-title">Buddies in your list</h3>
         </div>
         <div class="panel-body">
           <div class="list-group-item" ng-repeat="user in userCntrl.friendList()" ng-show="userCntrl.friendsFound">
