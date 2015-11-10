@@ -33338,8 +33338,8 @@ angular.module('Xpens-Track')
     $state.go('user')
   };
 
-  userCntrl.currentUser = function(){
-    return Parse.User.current();
+  userCntrl.currentUser = function(){    
+    return userService.user;
   };
 
   userCntrl.logout = function(){
@@ -33361,7 +33361,7 @@ angular.module('Xpens-Track')
       }
     }
   userCntrl.addFriend = function(user){
-    UserService.friendsList.push(user);
+    UserService.addFriend(user);
     console.log(userCntrl.friendsList);
   };
 
@@ -33443,13 +33443,14 @@ angular.module('Xpens-Track')
 
 }]);
 angular.module('Xpens-Track')
-  .service('AuthenticationService', function($state) {
+  .service('AuthenticationService', 'UserService', function($state, UserService) {
     var AuthenticationService = this;
 
     AuthenticationService.login = function(username, password) {
       Parse.User.logIn(username, password, {
         success: function(user) {
           console.log("Logged in as " + user.get("username"));
+          UserService.user = user;
           $state.go('user')
         }, error: function(user, error) {
           console.log("Error logging in: " + error.message);
@@ -33461,6 +33462,7 @@ angular.module('Xpens-Track')
       Parse.User.signUp(username, password, null, {
         success: function(user) {
           console.log("Signedup as " + user.get("username"));
+          UserService.user = user;
           $state.go('user')
         }, error: function(user, error) {
           console.log("Error signing up: " + error.message);
@@ -33481,3 +33483,16 @@ angular.module('Xpens-Track')
       return !!AuthenticationService.currentUser();
     };
   });
+
+angular.module('Xpens-Track')
+  .service('UserService', function($state){
+    //this service helps communicate data for user objects between controllers
+    var userService = this;
+    // share the user friend list through the different controllers
+    userService.user = {};
+    userService.user.friendsList = [];
+
+    userService.addFriend = function(user){
+      userService.user.friendsList.push(user);
+    };
+});

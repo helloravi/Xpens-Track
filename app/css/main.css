@@ -1,2 +1,5 @@
 .vcenter {
   transform: translateY(-25%); }
+
+header {
+  padding-top: 2px; }

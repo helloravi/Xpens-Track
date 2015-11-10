@@ -10,8 +10,8 @@ var jsFiles = [
     'app/js/src/controllers/routeConfig.js',
     'app/js/src/controllers/user-controller.js',
     'app/js/src/controllers/expense-controller.js',
-    'app/js/src/services/AuthenticationService.js'
-
+    'app/js/src/services/AuthenticationService.js',
+    'app/js/src/services/user-service.js'
 ]
 
   gulp.task('scripts', function(){

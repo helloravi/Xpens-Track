@@ -20,8 +20,8 @@ angular.module('Xpens-Track')
     $state.go('user')
   };
 
-  userCntrl.currentUser = function(){
-    return Parse.User.current();
+  userCntrl.currentUser = function(){    
+    return userService.user;
   };
 
   userCntrl.logout = function(){
@@ -43,7 +43,7 @@ angular.module('Xpens-Track')
       }
     }
   userCntrl.addFriend = function(user){
-    UserService.friendsList.push(user);
+    UserService.addFriend(user);
     console.log(userCntrl.friendsList);
   };
 
