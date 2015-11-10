@@ -12,8 +12,8 @@ var jsFiles = [
     'app/js/src/controllers/user-controller.js',
     'app/js/src/controllers/expense-controller.js',
     'app/js/src/services/user-service.js',
+    'app/js/src/services/ParseService.js',
     'app/js/src/services/AuthenticationService.js'
-
 ]
 
   gulp.task('scripts', function(){

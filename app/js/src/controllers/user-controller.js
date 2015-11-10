@@ -8,7 +8,8 @@ angular.module('Xpens-Track')
   };
 
   userCntrl.friendList = function(){
-    return UserService.friendsList;
+    console.log(UserService.getFriends());
+    return UserService.getFriends();
   }
 
   function redirectIfLoggedIn() {
@@ -18,22 +19,37 @@ angular.module('Xpens-Track')
   }
 
   userCntrl.login = function(){
-    console.log(userCntrl.loginusername);
-    console.log(userCntrl.loginpassword);
-    AuthenticationService.login(userCntrl.loginusername,userCntrl.loginpassword);
-    userCntrl.loginusername="";
-    userCntrl.loginpassword="";
+    userCntrl.loginProcessing=true;
+    var promise=AuthenticationService.login(userCntrl.loginusername,userCntrl.loginpassword);
+    promise.then(function(result){
+      console.log(result);
+      userCntrl.loginProcessing=false;
+      userCntrl.loginusername="";
+      userCntrl.loginpassword="";
+      $state.go('user');
+    }).catch(function(error){
+      console.log("Error logging in");
+      userCntrl.loginProcessing=false;
+    });
   };
 
   userCntrl.signup = function(){
-    console.log(userCntrl.signupusername);
-    console.log(userCntrl.signuppassword);
-    AuthenticationService.signup(userCntrl.signupusername,userCntrl.signuppassword);
-    $state.go('user')
+    userCntrl.signupProcessing=true;
+    var promise=AuthenticationService.signup(userCntrl.signupusername,userCntrl.signuppassword);
+    promise.then(function(result){
+      console.log(result);
+      userCntrl.signupProcessing=false;
+      userCntrl.signupusername="";
+      userCntrl.signuppassword="";
+      $state.go('user');
+    }).catch(function(error){
+      console.log("Error signing in");
+      userCntrl.signupProcessing=false;
+    });
   };
 
   userCntrl.currentUser = function(){
-    return Parse.User.current();
+    return userService.user;
   };
 
   userCntrl.logout = function(){
@@ -55,8 +71,8 @@ angular.module('Xpens-Track')
       }
     }
   userCntrl.addFriend = function(user){
-    UserService.friendsList.push(user);
-    console.log(userCntrl.friendsList);
+    UserService.addFriend(user);
+    console.log(UserService.user.friendsList);
   };
 
 
@@ -64,7 +80,7 @@ angular.module('Xpens-Track')
     // console.log(userCntrl.searchUser);
     userCntrl.friendsFound=false;
     userCntrl.friendsNotFound=false;
-    userCntrl.usersToAdd = [];
+    userCntrl.usersToAdd=[];
     var differedQuery = $q.defer();
     var query = new Parse.Query(Parse.User);
     query.equalTo("username", userCntrl.searchUser);
@@ -72,7 +88,7 @@ angular.module('Xpens-Track')
     query.find().then(function(data){
       differedQuery.resolve(data);
     }, function(){
-      differedQuery.resolve(error);
+      differedQuery.reject(error);
     });
 
 

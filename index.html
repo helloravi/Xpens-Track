@@ -8,6 +8,7 @@
   <script type="text/javascript" src="http://www.parsecdn.com/js/parse-latest.js"></script>
   <script type="text/javascript" src="app/js/main.js"></script>
   <link rel="stylesheet" type="text/css" href="app/css/main.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 </head>
 <body>
   <header>
@@ -25,8 +26,8 @@
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
           <ul class="nav navbar-nav navbar-right" ng-show="userCntrl.loggedIn()">
-            <li><a ui-sref="home">Expenses</a></li>
-            <li><a ui-sref="expenses">My Share</a></li>
+            <li><a ui-sref="expenses">Expenses</a></li>
+            <li><a ui-sref="user">Add Buddies</a></li>
             <li class="dropdown">
              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{userCntrl.username()}} <span class="caret"></span></a>
              <ul class="dropdown-menu" role="menu">

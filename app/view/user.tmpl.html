@@ -17,7 +17,7 @@
           </div>
         </fieldset>
       </form>
-      <div class="well" ng-show="userCntrl.friendsFound" ng-repeat="user in userCntrl.usersToAdd">
+      <div class="well" ng-show="userCntrl.friendsFound"  ng-repeat="user in userCntrl.usersToAdd">
         <span >{{user.get("username")}}</span>
         <button class="btn btn-info vcenter pull-right" ng-click="userCntrl.addFriend(user)">Add Friend</button>
       </div>
@@ -30,8 +30,8 @@
         <div class="panel-heading">
           <h3 class="panel-title">Buddies in your list</h3>
         </div>
-        <div class="panel-body">
-          <div class="list-group-item" ng-repeat="user in userCntrl.friendList()" ng-show="userCntrl.friendsFound">
+        <div class="panel-body" ng-if="userCntrl.friendList().length!=0">
+          <div class="list-group-item" ng-repeat="user in userCntrl.friendList()">
             {{user.get("username")}}
           </div>
         </div>

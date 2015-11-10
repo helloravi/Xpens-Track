@@ -1,36 +1,44 @@
 angular.module('Xpens-Track')
-  .service('AuthenticationService', function($state) {
+  .service('AuthenticationService', function($state, $q,UserService,ParseService) {
     var AuthenticationService = this;
 
     AuthenticationService.login = function(username, password) {
-      Parse.User.logIn(username, password, {
-        success: function(user) {
+      // As this is an async function using a promise
+        var promise=ParseService.login(username, password);
+        // Also create a promise as this function also needs to return one
+        var deffered=$q.defer();
+        promise.then(function(user){
+          UserService.user = user;
           console.log("Logged in as " + user.get("username"));
-          $state.go('user')
-        }, error: function(user, error) {
-          console.log("Error logging in: " + error.message);
-        }
-      });
+          deffered.resolve("User logged in");
+        }).catch(function(err){
+          deffered.reject("User not logged in");
+        });
+      return deffered.promise;
     };
 
     AuthenticationService.signup = function(username, password) {
-      Parse.User.signUp(username, password, null, {
-        success: function(user) {
-          console.log("Signedup as " + user.get("username"));
-          $state.go('user')
-        }, error: function(user, error) {
-          console.log("Error signing up: " + error.message);
-        }
-      });
+      // As this is an async function using a promise
+        var promise=ParseService.signup(username, password);
+        // Also create a promise as this function also needs to return one
+        var deffered=$q.defer();
+        promise.then(function(user){
+          UserService.user = user;
+          console.log("Signed up as " + user.get("username"));
+          deffered.resolve("User signed up");
+        }).catch(function(err){
+          deffered.reject("User not signed up");
+        });
+      return deffered.promise;
     };
 
+
     AuthenticationService.logout = function() {
-      Parse.User.logOut();
-      $state.go('home');
+      ParseService.logOut();
     };
 
     AuthenticationService.currentUser = function() {
-      return Parse.User.current();
+      return ParseService.currentUser();
     };
 
     AuthenticationService.loggedIn = function() {

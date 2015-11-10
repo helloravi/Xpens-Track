@@ -1,1 +1,60 @@
-<h1>Hello from the expense controller</h1>
+<div class="expenseAdder">
+  <form class="form-horizontal" ng-submit="expenseCntrl.saveExpense()">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label for="expenseDetail" class="col-lg-2 control-label">Expense Name</label>
+            <div class="col-lg-10">
+              <input type="text" class="form-control" id="expenseDescription" placeholder="What is this expense for" ng-model="expenseCntrl.title">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label for="expenseDate" class="col-sm-2 control-label">Date</label>
+            <div class="col-sm-10">
+              <input type="date" class="form-control" id="expenseDate"  ng-model="expenseCntrl.date">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label for="totalAmount" class="col-sm-2 control-label">TotalAmount</label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" id="expenseAmt"  ng-model="expenseCntrl.amount">
+            </div>
+          </div>
+        </div>
+        <!-- Div for choosing the person who paid amount" -->
+        <div class="col-sm-6">
+          <legend>Who paid for this expense</legend>
+          <div class="form-group">
+            <div class="checkbox" ng-repeat="friend in expenseCntrl.friendList()">
+               <label>
+                 <input type="radio" name="optionsRadios" ng-click="expenseCntrl.addPersonPaid(friend)"> {{friend.get("username")}}
+               </label>
+             </div>
+          </div>
+        </div>
+        <!-- Div for choosing the persons who all were sharers" -->
+        <div class="col-sm-6">
+          <legend>Who are all the sharers</legend>
+          <div class="form-group">
+            <div class="checkbox" ng-repeat="friend in expenseCntrl.friendList()">
+               <label>
+                 <input type="checkbox" ng-click="expenseCntrl.toggleSharerSelection(friend)"> {{friend.get("username")}}
+               </label>
+             </div>
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Add Expense</button>
+            <button type="reset" class="btn btn-default">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
