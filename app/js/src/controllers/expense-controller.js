@@ -31,6 +31,10 @@ angular.module('Xpens-Track')
     }
   };
 
+  expenseCntrl.resetAll= function(){
+    init();
+  };
+
   expenseCntrl.addPersonPaid=function(personPaid){
       expenseCntrl.personPaid=personPaid;
   };
@@ -40,29 +44,29 @@ angular.module('Xpens-Track')
     console.log(expenseCntrl.personPaid.get("username"));
     console.log(expenseCntrl.sharers);
      var share = calculateShare();
-     // Get the share of the 
-    // expenseCntrl.users.forEach(function(user){
-    //   user.share = share;
-    // });
-    //
-    // var Expense = Parse.Object.extend("Expense");
-    // var expense = new Expense();
-    //
-    // expense.set("title", expenseCntrl.title);
-    // expense.set("amount", expenseCntrl.amount);
-    // expense.set("users", expenseCntrl.users);
-    //
-    // expense.save(null, {
-    //   success: function(expense) {
-    //     // Execute any logic that should take place after the object is saved.
-    //     console.log("Success in writing Expense object to the database");
-    //   },
-    //   error: function(expense, error) {
-    //     // Execute any logic that should take place if the save fails.
-    //     // error is a Parse.Error with an error code and message.
-    //     alert('Failed to create new object, with error code: ' + error.message);
-    //   }
-    // });
+
+     //Update the share for the sharers in the list
+    expenseCntrl.sharers.forEach(function(user){
+      ParseService.updateShare(user,share*(-1))
+      .then(function(){
+        console.log("Expense updated successfully");
+      },function(){
+        console.log("Expense could not be updated");
+      });
+    });
+
+    // Update the share for the person paid
+    ParseService.updateShare(expenseCntrl.personPaid,expenseCntrl.amount)
+    .then(function(){
+      console.log("Expense updated successfully");
+    },function(){
+      console.log("Expense could not be updated");
+    });
+
+    // Update the expenseDetails
+    ParseService.createExpenseDetails(expenseCntrl.title,expenseCntrl.amount,expenseCntrl.date,
+      expenseCntrl.personPaid,expenseCntrl.sharers);
+
   };
   init();
 }]);

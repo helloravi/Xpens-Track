@@ -1,5 +1,5 @@
 angular.module('Xpens-Track')
-  .service('AuthenticationService', function($state, $q,UserService,ParseService) {
+  .service('AuthenticationService', function($state, $q,ParseService) {
     var AuthenticationService = this;
 
     AuthenticationService.login = function(username, password) {
@@ -8,9 +8,8 @@ angular.module('Xpens-Track')
         // Also create a promise as this function also needs to return one
         var deffered=$q.defer();
         promise.then(function(user){
-          UserService.user = user;
           console.log("Logged in as " + user.get("username"));
-          deffered.resolve("User logged in");
+          deffered.resolve(user);
         }).catch(function(err){
           deffered.reject("User not logged in");
         });
@@ -20,13 +19,13 @@ angular.module('Xpens-Track')
     AuthenticationService.signup = function(username, password) {
       // As this is an async function using a promise
         var promise=ParseService.signup(username, password);
+
         // Also create a promise as this function also needs to return one
         var deffered=$q.defer();
         promise.then(function(user){
-          UserService.user = user;
-          console.log("Signed up as " + user.get("username"));
-          deffered.resolve("User signed up");
-        }).catch(function(err){
+          //console.log("Signed up as " + user.get("username"));
+          deffered.resolve(user);
+        },function(err){
           deffered.reject("User not signed up");
         });
       return deffered.promise;

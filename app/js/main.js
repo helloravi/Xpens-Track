@@ -33272,11 +33272,10 @@ angular.module('ui.router.state')
   .filter('isState', $IsStateFilter)
   .filter('includedByState', $IncludedByStateFilter);
 })(window, window.angular);
-Parse.initialize("YPVBaH35TO8x3EPbBE9Pvks1JfWBBiIsYdPP4rpI", "c1XN80bwPHgIWXpTsIEsjovkOTpN0R6iR5TnLb1n");
+Parse.initialize("KrQJ0T2U22a32TwAs4IMOkLoPcrVq5RZVURuocML", "y12FE1XGHYxphJVA2BFGhaMEjJM5ZN9sEbjir1eT");
 // Start of Krello App Defintion
 // Trespassers NOT ALLOWED Beyond THIS POINT
 angular.module('Xpens-Track', ['ui.router']);
-
 
 angular.module('Xpens-Track')
 .run(function($rootScope, $state,AuthenticationService) {
@@ -33327,7 +33326,7 @@ angular.module('Xpens-Track')
 });
 
 angular.module('Xpens-Track')
-.controller('UserController', [ '$state', '$q', 'AuthenticationService', 'UserService', function($state, $q, AuthenticationService, UserService){
+.controller('UserController', [ '$state', 'AuthenticationService', 'UserService', function($state, AuthenticationService, UserService){
 
   var userCntrl = this;
 
@@ -33349,12 +33348,15 @@ angular.module('Xpens-Track')
   userCntrl.login = function(){
     userCntrl.loginProcessing=true;
     var promise=AuthenticationService.login(userCntrl.loginusername,userCntrl.loginpassword);
-    promise.then(function(result){
-      console.log(result);
+    promise.then(function(user){
       userCntrl.loginProcessing=false;
       userCntrl.loginusername="";
       userCntrl.loginpassword="";
+      UserService.user = user;
+      console.log("Loggin userservice");
+      console.log(UserService.user);
       $state.go('user');
+      UserService.loadFriends(user);
     }).catch(function(error){
       console.log("Error logging in");
       userCntrl.loginProcessing=false;
@@ -33364,12 +33366,13 @@ angular.module('Xpens-Track')
   userCntrl.signup = function(){
     userCntrl.signupProcessing=true;
     var promise=AuthenticationService.signup(userCntrl.signupusername,userCntrl.signuppassword);
-    promise.then(function(result){
-      console.log(result);
+    promise.then(function(user){
       userCntrl.signupProcessing=false;
       userCntrl.signupusername="";
       userCntrl.signuppassword="";
-      $state.go('user');
+      UserService.user = user;
+      UserService.initializeUserDetails(user).
+      then(function(){$state.go('user');},function(){});
     }).catch(function(error){
       console.log("Error signing in");
       userCntrl.signupProcessing=false;
@@ -33377,12 +33380,12 @@ angular.module('Xpens-Track')
   };
 
   userCntrl.currentUser = function(){
-    return userService.user;
+    return UserService.user;
   };
 
   userCntrl.logout = function(){
     AuthenticationService.logout();
-    //userCntrl.userLoggedIn = false;
+    //userService.friendsList = [];
     $state.go("home");
   };
 
@@ -33399,45 +33402,32 @@ angular.module('Xpens-Track')
       }
     }
   userCntrl.addFriend = function(user){
+    //debugger
     UserService.addFriend(user);
-    console.log(UserService.user.friendsList);
+    //console.log(UserService.user.friendsList);
   };
 
 
   userCntrl.searchFriend = function(){
-    // console.log(userCntrl.searchUser);
     userCntrl.friendsFound=false;
     userCntrl.friendsNotFound=false;
     userCntrl.usersToAdd=[];
-    var differedQuery = $q.defer();
-    var query = new Parse.Query(Parse.User);
-    query.equalTo("username", userCntrl.searchUser);
-    userCntrl.searchedUserName=userCntrl.searchUser;
-    query.find().then(function(data){
-      differedQuery.resolve(data);
-    }, function(){
-      differedQuery.reject(error);
-    });
-
-
-    differedQuery.promise
-    .then(function(result){
-      if (result.length !== 0) {
-        //debugger
-        userCntrl.usersToAdd.push(result[0]);
-        userCntrl.friendsFound=true;
-      } else {
-        console.log("nothing returned from Parse");
-        userCntrl.friendsFound=false;
-        userCntrl.friendsNotFound=true;
-      }
-    })
-    .catch(function(error){
-      userCntrl.friendsFound=false;
-      userCntrl.friendsNotFound=true;
-      console.log("error getting data for query: " + error.message);
-    })
-  };
+    var promise=UserService.searchUser(userCntrl.searchUser);
+      promise.then(function(result){
+        if (result.length !== 0) {
+          userCntrl.usersToAdd.push(result);
+          userCntrl.friendsFound=true;
+        } else {
+          console.log("nothing returned from Parse");
+          userCntrl.friendsFound=false;
+          userCntrl.friendsNotFound=true;
+        }
+        }).catch(function(err){
+          userCntrl.friendsFound=false;
+          userCntrl.friendsNotFound=true;
+          console.log("error getting data for query: " + err);
+        });
+    }
 
   init();
 
@@ -33476,6 +33466,10 @@ angular.module('Xpens-Track')
     }
   };
 
+  expenseCntrl.resetAll= function(){
+    init();
+  };
+
   expenseCntrl.addPersonPaid=function(personPaid){
       expenseCntrl.personPaid=personPaid;
   };
@@ -33485,68 +33479,101 @@ angular.module('Xpens-Track')
     console.log(expenseCntrl.personPaid.get("username"));
     console.log(expenseCntrl.sharers);
      var share = calculateShare();
-     // Get the share of the 
-    // expenseCntrl.users.forEach(function(user){
-    //   user.share = share;
-    // });
-    //
-    // var Expense = Parse.Object.extend("Expense");
-    // var expense = new Expense();
-    //
-    // expense.set("title", expenseCntrl.title);
-    // expense.set("amount", expenseCntrl.amount);
-    // expense.set("users", expenseCntrl.users);
-    //
-    // expense.save(null, {
-    //   success: function(expense) {
-    //     // Execute any logic that should take place after the object is saved.
-    //     console.log("Success in writing Expense object to the database");
-    //   },
-    //   error: function(expense, error) {
-    //     // Execute any logic that should take place if the save fails.
-    //     // error is a Parse.Error with an error code and message.
-    //     alert('Failed to create new object, with error code: ' + error.message);
-    //   }
-    // });
+
+     //Update the share for the sharers in the list
+    expenseCntrl.sharers.forEach(function(user){
+      ParseService.updateShare(user,share*(-1))
+      .then(function(){
+        console.log("Expense updated successfully");
+      },function(){
+        console.log("Expense could not be updated");
+      });
+    });
+
+    // Update the share for the person paid
+    ParseService.updateShare(expenseCntrl.personPaid,expenseCntrl.amount)
+    .then(function(){
+      console.log("Expense updated successfully");
+    },function(){
+      console.log("Expense could not be updated");
+    });
+
+    // Update the expenseDetails
+    ParseService.createExpenseDetails(expenseCntrl.title,expenseCntrl.amount,expenseCntrl.date,
+      expenseCntrl.personPaid,expenseCntrl.sharers);
+
   };
   init();
 }]);
 
 angular.module('Xpens-Track')
-  .service('UserService', function(){
+  .service('UserService', function($q){
     //this service helps communicate data for user objects between controllers
     var userService = this;
     // share the user friend list through the different controllers
     userService.user = {};
-    userService.user.friendsList = [];
+    userService.friendsList = [];
+
+    userService.loadFriends=function(user){
+      deffered=$q.defer();
+      ParseService.getFriends(user)
+      .then(function(friendsList){
+        deffered.resolve(friendsList);
+      },function(error){
+        console.log("Error loading friends");
+        deffered.reject(error);
+      });
+      deffered.promise.then(function(friendsList){
+        debugger
+        userService.friendsList=friendsList;
+        console.log("Loaded Friends");
+      }).catch(function(error){
+
+      });
+    }
 
     userService.addFriend = function(user){
-      if (userService.user.friendsList.indexOf(user) === -1) {
-        userService.user.friendsList.push(user);
+      if (userService.friendsList.indexOf(user) === -1) {
+          userService.friendsList.push(user);
       }
-      console.log("In User Service : "+userService.user.friendsList);
+      ParseService.addFriend(userService.user,userService.friendsList);
+      console.log("In User Service : "+userService.friendsList);
     };
     userService.getFriends=function(){
-      return userService.user.friendsList;
+      return userService.friendsList;
+    }
+
+    userService.searchUser=function(userName){
+      // As this is an async function using a promise
+        var promise=ParseService.searchUser(userName);
+        // Also create a promise as this function also needs to return one
+        var deffered=$q.defer();
+        promise.then(function(user){
+          console.log("User found" + user.get("username"));
+          deffered.resolve(user);
+        }).catch(function(err){
+          deffered.reject("User not found");
+        });
+      return deffered.promise;
+
+    }
+
+    userService.initializeUserDetails=function(user){
+      // As this is an async function using a promise
+        var promise=ParseService.createUserDetails(user);
+        // Also create a promise as this function also needs to return one
+        return promise;
+        // promise.then(function(user){
+        //   console.log("User Details initialized");
+        // },function(err){
+        //   console.log("User Details not initialized");
+        // });
     }
 });
 
 angular.module('Xpens-Track')
   .service('ParseService', function($q){
     ParseService=this;
-    // This method is to update the share amount after the split
-    ParseService.updateShare = function(user, share) {
-      var query = new Parse.Query(Parse.UserDetails);
-      query.equalTo("username", user.get("username"));
-      query.find().then(function(result){
-        net_amt=result[0].get("net_share");
-        net_amt+=share;
-        result[0].set("net_share",net_amt);
-        result[0].save();
-      }, function(){
-        differedQuery.resolve(error);
-      });
-    };
     // This method is for user login
     ParseService.login = function(username, password) {
       deffered=$q.defer();
@@ -33563,17 +33590,30 @@ angular.module('Xpens-Track')
     };
     // This method is for user sign up
     ParseService.signup = function(username, password) {
-      deffered=$q.defer();
-      Parse.User.signUp(username, password, {
-        success: function(user) {
-          deffered.resolve(user);
-          console.log("Signed up as " + user.get("username"));
-        }, error: function(user, error) {
-          deffered.reject("Error signing up the user");
-          console.log("Error logging in: " + error.message);
-        }
+      return Parse.User.signUp(username, password).then(function(user){
+        console.log("Signed up as " + user.get("username"));
+        return user;
+      },function(user,error){
+        console.log("Error logging in: " + error);
       });
-      return deffered.promise;
+    };
+
+    ParseService.createUserDetails=function(user){
+      var UserDetails = Parse.Object.extend("UserDetails");
+      var userDetail = new UserDetails();
+
+      userDetail.set("user_id", user.id);
+      userDetail.set("net_amount", 0);
+      userDetail.set("friends", []);
+      // This method returns a promise
+      return userDetail.save(null);
+      // return userDetail.save(null).then(function(result){
+      //   console.log("User Details created");
+      //   console.log(result);
+      //   return result;
+      // },function(user,error){
+      //   console.log("Error creating user details: " + error.message);
+      // });
     };
 
     ParseService.logOut=function(){
@@ -33584,26 +33624,102 @@ angular.module('Xpens-Track')
       return Parse.User.current();
     }
 
-    // This method is for finding user
-    ParseService.signup = function(username, password) {
-      deffered=$q.defer();
-      console.log("Before singp");
-      Parse.User.signUp(username, password, null,{
-        success: function(user) {
-          deffered.resolve(user);
-          console.log("Signed up as " + user.get("username"));
-        }, error: function(user, error) {
-          deffered.reject("Error signing up the user");
+    // This method is for searching user
+    ParseService.searchUser = function(userName) {
+        deffered=$q.defer();
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("username", userName);
+        query.find().then(function(user){
+          //debugger
+          deffered.resolve(user[0]);
+        }, function(user,error){
           console.log("Error logging in: " + error.message);
-        }
-      });
+          deffered.reject("Error finding the user");
+        });
       return deffered.promise;
     };
+
+    // This method is to update the share amount after the split
+    ParseService.updateShare = function(user, share) {
+      var UserDetails = Parse.Object.extend("UserDetails");
+      var query = new Parse.Query(UserDetails);
+      query.equalTo("user_id", user.id);
+      return query.find().then(function(result){
+        user=result[0];
+        net_amt=user.get("net_amount");
+        net_amt+=share;
+        user.set("net_amount",net_amt);
+        return user.save(null);
+      }, function(error){
+        console.log("User not found, error:"+error);
+        return "User not found";
+      });
+    };
+
+    // Update the Expense details in the Expense Master
+    ParseService.createExpenseDetails=function(expDesc,expAmt,expDate,expPaidBy,expSharers){
+
+      var Expense = Parse.Object.extend("Expense");
+      var expense = new Expense();
+
+      expense.set("Desc", expDesc);
+      expense.set("Amount", expAmt);
+      expense.set("PaidBy", expPaidBy);
+      expense.set("date", expDate);
+      expense.set("Sharers", expSharers);
+      //debugger
+      expense.save(null, {
+        success: function(expense) {
+          // Execute any logic that should take place after the object is saved.
+          console.log("Success in writing Expense object to the database");
+        },
+        error: function(expense, error) {
+          // Execute any logic that should take place if the save fails.
+          // error is a Parse.Error with an error code and message.
+          alert('Failed to create new object, with error code: ' + error.message);
+        }
+      });
+    };
+
+    // Add Friends of the current user to his list
+    ParseService.addFriend = function(user,friendList){
+      var UserDetails = Parse.Object.extend("UserDetails");
+      var query = new Parse.Query(UserDetails);
+      debugger
+      query.equalTo("user_id", user.id);
+      return query.find().then(function(result){
+        debugger
+        user=result[0];
+        user.set("friends",friendList);
+        return user.save(null);
+      }, function(error){
+        console.log("User not found, error:"+error);
+        return "User not found";
+      });
+    }
+
+    //Load List of friends
+    // Add Friends of the current user to his list
+    ParseService.getFriends = function(user){
+      var UserDetails = Parse.Object.extend("UserDetails");
+      var query = new Parse.Query(UserDetails);
+      query.equalTo("user_id", user.id);
+      //debugger
+      return query.find().then(function(result){
+        user=result[0];
+        friendList=user.get("friends");
+        return friendList;
+      }, function(error){
+        console.log("User not found, error:"+error);
+        return "User not found";
+      });
+    }
+
 
 });
 
 angular.module('Xpens-Track')
-  .service('AuthenticationService', function($state, $q,UserService,ParseService) {
+  .service('AuthenticationService', function($state, $q,ParseService) {
     var AuthenticationService = this;
 
     AuthenticationService.login = function(username, password) {
@@ -33612,9 +33728,8 @@ angular.module('Xpens-Track')
         // Also create a promise as this function also needs to return one
         var deffered=$q.defer();
         promise.then(function(user){
-          UserService.user = user;
           console.log("Logged in as " + user.get("username"));
-          deffered.resolve("User logged in");
+          deffered.resolve(user);
         }).catch(function(err){
           deffered.reject("User not logged in");
         });
@@ -33624,13 +33739,13 @@ angular.module('Xpens-Track')
     AuthenticationService.signup = function(username, password) {
       // As this is an async function using a promise
         var promise=ParseService.signup(username, password);
+
         // Also create a promise as this function also needs to return one
         var deffered=$q.defer();
         promise.then(function(user){
-          UserService.user = user;
-          console.log("Signed up as " + user.get("username"));
-          deffered.resolve("User signed up");
-        }).catch(function(err){
+          //console.log("Signed up as " + user.get("username"));
+          deffered.resolve(user);
+        },function(err){
           deffered.reject("User not signed up");
         });
       return deffered.promise;

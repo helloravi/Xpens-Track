@@ -1,5 +1,5 @@
 angular.module('Xpens-Track')
-.controller('UserController', [ '$state', '$q', 'AuthenticationService', 'UserService', function($state, $q, AuthenticationService, UserService){
+.controller('UserController', [ '$state', 'AuthenticationService', 'UserService', function($state, AuthenticationService, UserService){
 
   var userCntrl = this;
 
@@ -21,12 +21,15 @@ angular.module('Xpens-Track')
   userCntrl.login = function(){
     userCntrl.loginProcessing=true;
     var promise=AuthenticationService.login(userCntrl.loginusername,userCntrl.loginpassword);
-    promise.then(function(result){
-      console.log(result);
+    promise.then(function(user){
       userCntrl.loginProcessing=false;
       userCntrl.loginusername="";
       userCntrl.loginpassword="";
+      UserService.user = user;
+      console.log("Loggin userservice");
+      console.log(UserService.user);
       $state.go('user');
+      UserService.loadFriends(user);
     }).catch(function(error){
       console.log("Error logging in");
       userCntrl.loginProcessing=false;
@@ -36,12 +39,13 @@ angular.module('Xpens-Track')
   userCntrl.signup = function(){
     userCntrl.signupProcessing=true;
     var promise=AuthenticationService.signup(userCntrl.signupusername,userCntrl.signuppassword);
-    promise.then(function(result){
-      console.log(result);
+    promise.then(function(user){
       userCntrl.signupProcessing=false;
       userCntrl.signupusername="";
       userCntrl.signuppassword="";
-      $state.go('user');
+      UserService.user = user;
+      UserService.initializeUserDetails(user).
+      then(function(){$state.go('user');},function(){});
     }).catch(function(error){
       console.log("Error signing in");
       userCntrl.signupProcessing=false;
@@ -49,12 +53,12 @@ angular.module('Xpens-Track')
   };
 
   userCntrl.currentUser = function(){
-    return userService.user;
+    return UserService.user;
   };
 
   userCntrl.logout = function(){
     AuthenticationService.logout();
-    //userCntrl.userLoggedIn = false;
+    //userService.friendsList = [];
     $state.go("home");
   };
 
@@ -71,45 +75,32 @@ angular.module('Xpens-Track')
       }
     }
   userCntrl.addFriend = function(user){
+    //debugger
     UserService.addFriend(user);
-    console.log(UserService.user.friendsList);
+    //console.log(UserService.user.friendsList);
   };
 
 
   userCntrl.searchFriend = function(){
-    // console.log(userCntrl.searchUser);
     userCntrl.friendsFound=false;
     userCntrl.friendsNotFound=false;
     userCntrl.usersToAdd=[];
-    var differedQuery = $q.defer();
-    var query = new Parse.Query(Parse.User);
-    query.equalTo("username", userCntrl.searchUser);
-    userCntrl.searchedUserName=userCntrl.searchUser;
-    query.find().then(function(data){
-      differedQuery.resolve(data);
-    }, function(){
-      differedQuery.reject(error);
-    });
-
-
-    differedQuery.promise
-    .then(function(result){
-      if (result.length !== 0) {
-        //debugger
-        userCntrl.usersToAdd.push(result[0]);
-        userCntrl.friendsFound=true;
-      } else {
-        console.log("nothing returned from Parse");
-        userCntrl.friendsFound=false;
-        userCntrl.friendsNotFound=true;
-      }
-    })
-    .catch(function(error){
-      userCntrl.friendsFound=false;
-      userCntrl.friendsNotFound=true;
-      console.log("error getting data for query: " + error.message);
-    })
-  };
+    var promise=UserService.searchUser(userCntrl.searchUser);
+      promise.then(function(result){
+        if (result.length !== 0) {
+          userCntrl.usersToAdd.push(result);
+          userCntrl.friendsFound=true;
+        } else {
+          console.log("nothing returned from Parse");
+          userCntrl.friendsFound=false;
+          userCntrl.friendsNotFound=true;
+        }
+        }).catch(function(err){
+          userCntrl.friendsFound=false;
+          userCntrl.friendsNotFound=true;
+          console.log("error getting data for query: " + err);
+        });
+    }
 
   init();
 

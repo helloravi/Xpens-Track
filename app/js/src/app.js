@@ -1,5 +1,4 @@
-Parse.initialize("YPVBaH35TO8x3EPbBE9Pvks1JfWBBiIsYdPP4rpI", "c1XN80bwPHgIWXpTsIEsjovkOTpN0R6iR5TnLb1n");
+Parse.initialize("KrQJ0T2U22a32TwAs4IMOkLoPcrVq5RZVURuocML", "y12FE1XGHYxphJVA2BFGhaMEjJM5ZN9sEbjir1eT");
 // Start of Krello App Defintion
 // Trespassers NOT ALLOWED Beyond THIS POINT
 angular.module('Xpens-Track', ['ui.router']);
-
