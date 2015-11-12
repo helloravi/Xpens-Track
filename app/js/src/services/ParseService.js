@@ -26,22 +26,15 @@ angular.module('Xpens-Track')
     };
 
     ParseService.createUserDetails=function(user){
-      var UserDetails = Parse.Object.extend("UserDetails");
-      var userDetail = new UserDetails();
+       var UserDetails = Parse.Object.extend("UserDetails");
+       var userDetail = new UserDetails();
 
-      userDetail.set("user_id", user.id);
-      userDetail.set("net_amount", 0);
-      userDetail.set("friends", []);
-      // This method returns a promise
-      return userDetail.save(null);
-      // return userDetail.save(null).then(function(result){
-      //   console.log("User Details created");
-      //   console.log(result);
-      //   return result;
-      // },function(user,error){
-      //   console.log("Error creating user details: " + error.message);
-      // });
-    };
+       userDetail.set("user_id", user.id);
+       userDetail.set("net_amount", 0);
+       userDetail.set("friends", []);
+       // This method returns a promise
+       return userDetail.save(null);
+     };
 
     ParseService.logOut=function(){
       Parse.User.logOut();
@@ -112,10 +105,10 @@ angular.module('Xpens-Track')
     ParseService.addFriend = function(user,friendList){
       var UserDetails = Parse.Object.extend("UserDetails");
       var query = new Parse.Query(UserDetails);
-      debugger
+      //debugger
       query.equalTo("user_id", user.id);
       return query.find().then(function(result){
-        debugger
+        //debugger
         user=result[0];
         user.set("friends",friendList);
         return user.save(null);
@@ -127,20 +120,47 @@ angular.module('Xpens-Track')
 
     //Load List of friends
     // Add Friends of the current user to his list
-    ParseService.getFriends = function(user){
+    ParseService.getUserDetails = function(user){
       var UserDetails = Parse.Object.extend("UserDetails");
       var query = new Parse.Query(UserDetails);
       query.equalTo("user_id", user.id);
       //debugger
       return query.find().then(function(result){
-        user=result[0];
-        friendList=user.get("friends");
-        return friendList;
+        userDetails=result[0];
+        //friendList=user.get("friends");
+        return userDetails;
       }, function(error){
         console.log("User not found, error:"+error);
         return "User not found";
       });
+      // }).then(function(friendList){
+      //     // For each of id in the friendsList, get the user object associated with it
+      //     friendsListObjects=[];
+      //     friendList.forEach(function(userId){
+      //       ParseService.getUser(userId)
+      //       .then(function(result){
+      //           user=result[0];
+      //           friendsListObjects.push(user);
+      //           console.log("Got one more user from backend..friendList:"+friendsListObjects);
+      //       });
+      //     });
+      //     return friendsListObjects;
+      // },function(){});
     }
 
+    //Get the user object corresponding to the id passed
+    ParseService.getUser = function(userId){
+      var query = new Parse.Query(Parse.User);
+      query.equalTo("objectId",userId );
+      return query.find();
+    }
+
+    // This method gets the net amount due for the current user
+    ParseService.getAmtDue = function(userId){
+      var UserDetails = Parse.Object.extend("UserDetails");
+      var query = new Parse.Query(UserDetails);
+      query.equalTo("user_id",userId );
+      return query.find();
+    }
 
 });

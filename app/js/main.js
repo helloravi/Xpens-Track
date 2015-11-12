@@ -33326,16 +33326,24 @@ angular.module('Xpens-Track')
 });
 
 angular.module('Xpens-Track')
-.controller('UserController', [ '$state', 'AuthenticationService', 'UserService', function($state, AuthenticationService, UserService){
+.controller('UserController', [ '$state', 'AuthenticationService', 'UserService','$timeout', function($state, AuthenticationService, UserService,$timeout){
 
   var userCntrl = this;
 
   function init(){
     redirectIfLoggedIn();
+    // userCntrl.net_amount = UserService.getNetAmt();
   };
 
+  userCntrl.netAmount = function() {
+    return UserService.getNetAmt();
+  };
+
+  /*userCntrl.net_amount =function(){
+    return UserService.getNetAmt();
+  }*/
   userCntrl.friendList = function(){
-    console.log(UserService.getFriends());
+    //console.log(UserService.getFriends());
     return UserService.getFriends();
   }
 
@@ -33345,6 +33353,7 @@ angular.module('Xpens-Track')
     }
   }
 
+
   userCntrl.login = function(){
     userCntrl.loginProcessing=true;
     var promise=AuthenticationService.login(userCntrl.loginusername,userCntrl.loginpassword);
@@ -33353,10 +33362,25 @@ angular.module('Xpens-Track')
       userCntrl.loginusername="";
       userCntrl.loginpassword="";
       UserService.user = user;
-      console.log("Loggin userservice");
-      console.log(UserService.user);
+      //console.log("Loggin userservice");
+      //console.log(UserService.user);
       $state.go('user');
-      UserService.loadFriends(user);
+      promise=UserService.loadFriends(user);
+      promise.then(function(userDetails){
+          UserService.net_amt_due=userDetails.net_amt_due;
+          UserService.friendsList=userDetails.friendList;
+          $timeout(function(){
+              console.log(userDetails.net_amt_due);
+              userCntrl.net_amount=userDetails.net_amt_due;
+              console.log(userCntrl.net_amount);
+          });
+          console.log(userDetails);
+          console.log("Loaded Friends");
+          console.log("After actual load Friends"+UserService.getNetAmt());
+          console.log("After load Friends"+userCntrl.net_amount);
+        }).catch(function(error){
+          console.log(error);
+        });
     }).catch(function(error){
       console.log("Error logging in");
       userCntrl.loginProcessing=false;
@@ -33380,7 +33404,7 @@ angular.module('Xpens-Track')
   };
 
   userCntrl.currentUser = function(){
-    return UserService.user;
+    return UserService.getLoggedInUser();
   };
 
   userCntrl.logout = function(){
@@ -33511,33 +33535,53 @@ angular.module('Xpens-Track')
     //this service helps communicate data for user objects between controllers
     var userService = this;
     // share the user friend list through the different controllers
-    userService.user = {};
-    userService.friendsList = [];
-
+    function init(){
+        userService.user = {};
+        userService.net_amt_due=0;
+        userService.friendsList = [];
+        userService.friendsListObjects = [];
+    }
+    userService.getNetAmt=function(){
+      return userService.net_amt_due;
+    }
     userService.loadFriends=function(user){
       deffered=$q.defer();
-      ParseService.getFriends(user)
-      .then(function(friendsList){
-        deffered.resolve(friendsList);
-      },function(error){
+      ParseService.getUserDetails(user)
+      .then(function(userDetails){
+        // For each of the object in friendsList get the user objects
+        listOfPromises=[];
+        friendsListObjs=[];
+        net_amt_due=userDetails.get("net_amount");
+        friendsList=userDetails.get("friends");
+        friendsList.forEach(function(userId){
+          var promise=ParseService.getUser(userId)
+            .then(function(result){
+                    user=result[0];
+                    friendsListObjs.push(user);
+                    console.log("Got one more user from backend..friendList:"+friendsListObjs);
+                });
+          listOfPromises.push(promise);
+        });
+        $q.all(listOfPromises).then(function(){
+            console.log("All users fetched from backend");
+            userDetails.net_amt_due=roundToTwo(net_amt_due);
+            userDetails.friendList=friendsListObjs;
+            deffered.resolve(userDetails);
+        },function(error){
         console.log("Error loading friends");
         deffered.reject(error);
       });
-      deffered.promise.then(function(friendsList){
-        debugger
-        userService.friendsList=friendsList;
-        console.log("Loaded Friends");
-      }).catch(function(error){
-
-      });
+    });
+    return deffered.promise;
     }
 
     userService.addFriend = function(user){
       if (userService.friendsList.indexOf(user) === -1) {
           userService.friendsList.push(user);
+          userService.friendsListObjects.push(user.id);
       }
-      ParseService.addFriend(userService.user,userService.friendsList);
-      console.log("In User Service : "+userService.friendsList);
+      ParseService.addFriend(userService.getLoggedInUser(), userService.friendsListObjects);
+      //console.log("In User Service : "+userService.friendsList);
     };
     userService.getFriends=function(){
       return userService.friendsList;
@@ -33569,6 +33613,15 @@ angular.module('Xpens-Track')
         //   console.log("User Details not initialized");
         // });
     }
+
+    function roundToTwo(num) {
+    return +(Math.round(num + "e+2")  + "e-2");
+}
+
+    userService.getLoggedInUser=function(){
+      return ParseService.currentUser();
+    }
+    init();
 });
 
 angular.module('Xpens-Track')
@@ -33599,22 +33652,15 @@ angular.module('Xpens-Track')
     };
 
     ParseService.createUserDetails=function(user){
-      var UserDetails = Parse.Object.extend("UserDetails");
-      var userDetail = new UserDetails();
+       var UserDetails = Parse.Object.extend("UserDetails");
+       var userDetail = new UserDetails();
 
-      userDetail.set("user_id", user.id);
-      userDetail.set("net_amount", 0);
-      userDetail.set("friends", []);
-      // This method returns a promise
-      return userDetail.save(null);
-      // return userDetail.save(null).then(function(result){
-      //   console.log("User Details created");
-      //   console.log(result);
-      //   return result;
-      // },function(user,error){
-      //   console.log("Error creating user details: " + error.message);
-      // });
-    };
+       userDetail.set("user_id", user.id);
+       userDetail.set("net_amount", 0);
+       userDetail.set("friends", []);
+       // This method returns a promise
+       return userDetail.save(null);
+     };
 
     ParseService.logOut=function(){
       Parse.User.logOut();
@@ -33685,10 +33731,10 @@ angular.module('Xpens-Track')
     ParseService.addFriend = function(user,friendList){
       var UserDetails = Parse.Object.extend("UserDetails");
       var query = new Parse.Query(UserDetails);
-      debugger
+      //debugger
       query.equalTo("user_id", user.id);
       return query.find().then(function(result){
-        debugger
+        //debugger
         user=result[0];
         user.set("friends",friendList);
         return user.save(null);
@@ -33700,21 +33746,48 @@ angular.module('Xpens-Track')
 
     //Load List of friends
     // Add Friends of the current user to his list
-    ParseService.getFriends = function(user){
+    ParseService.getUserDetails = function(user){
       var UserDetails = Parse.Object.extend("UserDetails");
       var query = new Parse.Query(UserDetails);
       query.equalTo("user_id", user.id);
       //debugger
       return query.find().then(function(result){
-        user=result[0];
-        friendList=user.get("friends");
-        return friendList;
+        userDetails=result[0];
+        //friendList=user.get("friends");
+        return userDetails;
       }, function(error){
         console.log("User not found, error:"+error);
         return "User not found";
       });
+      // }).then(function(friendList){
+      //     // For each of id in the friendsList, get the user object associated with it
+      //     friendsListObjects=[];
+      //     friendList.forEach(function(userId){
+      //       ParseService.getUser(userId)
+      //       .then(function(result){
+      //           user=result[0];
+      //           friendsListObjects.push(user);
+      //           console.log("Got one more user from backend..friendList:"+friendsListObjects);
+      //       });
+      //     });
+      //     return friendsListObjects;
+      // },function(){});
     }
 
+    //Get the user object corresponding to the id passed
+    ParseService.getUser = function(userId){
+      var query = new Parse.Query(Parse.User);
+      query.equalTo("objectId",userId );
+      return query.find();
+    }
+
+    // This method gets the net amount due for the current user
+    ParseService.getAmtDue = function(userId){
+      var UserDetails = Parse.Object.extend("UserDetails");
+      var query = new Parse.Query(UserDetails);
+      query.equalTo("user_id",userId );
+      return query.find();
+    }
 
 });
 

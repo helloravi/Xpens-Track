@@ -1,14 +1,22 @@
 angular.module('Xpens-Track')
-.controller('UserController', [ '$state', 'AuthenticationService', 'UserService', function($state, AuthenticationService, UserService){
+.controller('UserController', [ '$state', 'AuthenticationService', 'UserService','$timeout', function($state, AuthenticationService, UserService,$timeout){
 
   var userCntrl = this;
 
   function init(){
     redirectIfLoggedIn();
+    // userCntrl.net_amount = UserService.getNetAmt();
   };
 
+  userCntrl.netAmount = function() {
+    return UserService.getNetAmt();
+  };
+
+  /*userCntrl.net_amount =function(){
+    return UserService.getNetAmt();
+  }*/
   userCntrl.friendList = function(){
-    console.log(UserService.getFriends());
+    //console.log(UserService.getFriends());
     return UserService.getFriends();
   }
 
@@ -18,6 +26,7 @@ angular.module('Xpens-Track')
     }
   }
 
+
   userCntrl.login = function(){
     userCntrl.loginProcessing=true;
     var promise=AuthenticationService.login(userCntrl.loginusername,userCntrl.loginpassword);
@@ -26,10 +35,25 @@ angular.module('Xpens-Track')
       userCntrl.loginusername="";
       userCntrl.loginpassword="";
       UserService.user = user;
-      console.log("Loggin userservice");
-      console.log(UserService.user);
+      //console.log("Loggin userservice");
+      //console.log(UserService.user);
       $state.go('user');
-      UserService.loadFriends(user);
+      promise=UserService.loadFriends(user);
+      promise.then(function(userDetails){
+          UserService.net_amt_due=userDetails.net_amt_due;
+          UserService.friendsList=userDetails.friendList;
+          $timeout(function(){
+              console.log(userDetails.net_amt_due);
+              userCntrl.net_amount=userDetails.net_amt_due;
+              console.log(userCntrl.net_amount);
+          });
+          console.log(userDetails);
+          console.log("Loaded Friends");
+          console.log("After actual load Friends"+UserService.getNetAmt());
+          console.log("After load Friends"+userCntrl.net_amount);
+        }).catch(function(error){
+          console.log(error);
+        });
     }).catch(function(error){
       console.log("Error logging in");
       userCntrl.loginProcessing=false;
@@ -53,7 +77,7 @@ angular.module('Xpens-Track')
   };
 
   userCntrl.currentUser = function(){
-    return UserService.user;
+    return UserService.getLoggedInUser();
   };
 
   userCntrl.logout = function(){
